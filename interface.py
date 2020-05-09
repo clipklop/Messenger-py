@@ -65,6 +65,7 @@ class Ui_MainWindow(object):
         self.actionQuit.setText(QCoreApplication.translate("MainWindow", u"Quit", None))
         self.plainTextEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Connecting to the server", None))
         self.lineEdit.setText("")
+        self.lineEdit.setText(QCoreApplication.translate("MainWindow", u"login:", None))
         self.lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here...", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Send", None))
 #if QT_CONFIG(shortcut)

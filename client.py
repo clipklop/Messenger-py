@@ -50,8 +50,8 @@ class Chat(QMainWindow, Ui_MainWindow):
 
     def create_protocol(self):
         # attach window to client protocol
-        self.protocol1 = ClientProtocol(self)
-        return self.protocol1
+        self.protocol = ClientProtocol(self)
+        return self.protocol
 
     async def start(self):
         # show chat window
@@ -63,12 +63,10 @@ class Chat(QMainWindow, Ui_MainWindow):
         coroutine = loop.create_connection(
             self.create_protocol,
             "127.0.0.1",
-            9898,
+            8888,
         )
 
         # client has only one connection, therefore just one coroutine with 1 sec timeout 
-        # await asyncio.wait_for(coroutine, 1000)
-        # app hangs with 1 sec
         await asyncio.wait_for(coroutine, 1000)
 
 
@@ -81,9 +79,11 @@ loop = QEventLoop(app)
 asyncio.set_event_loop(loop)
 
 window = Chat()
-x = ClientProtocol(window)
-print(dir(x))
+
 # create task in loop event
 loop.create_task(window.start())
-app.exec_()
+
+# Without it client hangs in win7, but in osx it generates other problems
+# app.exec_()
+
 loop.run_forever()

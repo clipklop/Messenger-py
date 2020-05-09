@@ -27,16 +27,17 @@ class ClientProtocol(asyncio.Protocol):
                 # check if login is in use
                 for user in self.server.clients:
                     if user.login == temp_login:
-                        self.transport.write('Login has already in use')
+                        self.transport.write('Login has already in use'.encode())
                         self.transport.close()
                         return
                 
+                self.login = temp_login
                 self.transport.write(
-                    f'Welcome back, {temp_login}'.encode()
+                    f'Welcome back, {self.login}'.encode()
                 )
                 self.send_history()
-            else:
-                self.send_message(decoded)
+        else:
+            self.send_message(decoded)
     
     def send_history(self):
         last_messages = self.server.messages[-10:]
@@ -50,7 +51,12 @@ class ClientProtocol(asyncio.Protocol):
 
         encoded = format_string.encode()
 
-        [client.transport.write(encoded) for client in self.server.clients if client.login != self.login]
+        # send your message to all clients in chat
+        # [client.transport.write(encoded) for client in self.server.clients if client.login != self.login]
+        print(self.server.clients)
+        for client in self.server.clients:
+            if client.login != self.login:
+                client.transport.write(encoded)
 
     def connection_made(self, transport: transports.Transport):
         self.transport = transport
@@ -79,7 +85,7 @@ class Server:
         coroutine = await loop.create_server(
             self.create_protocol,
             "127.0.0.1",
-            9898,
+            8888,
         )
 
         print('Server has been started...')
