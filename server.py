@@ -25,14 +25,14 @@ class ClientProtocol(asyncio.Protocol):
                 temp_login = decoded.replace('login:','').replace('\r\n', '')
                 
                 # check if login is in use
-                for user in self.server_clients:
+                for user in self.server.clients:
                     if user.login == temp_login:
                         self.transport.write('Login has already in use')
                         self.transport.close()
                         return
                 
                 self.transport.write(
-                    f'Welcome back, {self.login}'.encode()
+                    f'Welcome back, {temp_login}'.encode()
                 )
                 self.send_history()
             else:
@@ -79,8 +79,7 @@ class Server:
         coroutine = await loop.create_server(
             self.create_protocol,
             "127.0.0.1",
-            8888,
-
+            9898,
         )
 
         print('Server has been started...')

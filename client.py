@@ -21,7 +21,9 @@ class ClientProtocol(asyncio.Protocol):
         self.window = chat
 
     def data_received(self, data: bytes):
-        self.window.plainTextEdit.appendPlainText('Connection has been lost')
+        print(data)
+        decoded = data.decode()
+        self.window.plainTextEdit.appendPlainText(decoded)
 
     def connection_made(self, transport: transports.Transport):
         self.window.plainTextEdit.appendPlainText('Connection established successfully, enter your login')
@@ -48,8 +50,8 @@ class Chat(QMainWindow, Ui_MainWindow):
 
     def create_protocol(self):
         # attach window to client protocol
-        self.protocol = ClientProtocol(self)
-        return self.protocol
+        self.protocol1 = ClientProtocol(self)
+        return self.protocol1
 
     async def start(self):
         # show chat window
@@ -61,15 +63,16 @@ class Chat(QMainWindow, Ui_MainWindow):
         coroutine = loop.create_connection(
             self.create_protocol,
             "127.0.0.1",
-            8888,
+            9898,
         )
 
         # client has only one connection, therefore just one coroutine with 1 sec timeout 
+        # await asyncio.wait_for(coroutine, 1000)
+        # app hangs with 1 sec
         await asyncio.wait_for(coroutine, 1000)
 
 
 app = QApplication()
-
 # since PyQT is not fully support asynchronous, we'll use module 'asyncqt'
 # to switch between async server events and sync events from PyQT
 loop = QEventLoop(app)
@@ -78,7 +81,9 @@ loop = QEventLoop(app)
 asyncio.set_event_loop(loop)
 
 window = Chat()
-
+x = ClientProtocol(window)
+print(dir(x))
 # create task in loop event
 loop.create_task(window.start())
+app.exec_()
 loop.run_forever()
